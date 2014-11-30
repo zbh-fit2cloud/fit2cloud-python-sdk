@@ -503,8 +503,6 @@ examples:
         args = parser.parse_args(sys.argv[2:])
         if type(args.cluster_id) is str and type(args.server_id) is str:
             jsonServer = f2cWsClient.getServer(args.cluster_id, args.server_id)
-            #To Do: f2cWsClient should raise the error message
-            #       then display here according to the msg, such as server id does not exist in account
             dictServer=json.loads(jsonServer)
             jsonServer = json.dumps(dictServer, indent=2)
             print jsonServer
@@ -525,8 +523,6 @@ examples:
         arg('--cluster-id', nargs='?', const=True, default=False, metavar='Cluster Id', help='Cluster Id, --cluster-id is required', required=True)
         
         args = parser.parse_args(sys.argv[2:])
-        #To Do: f2cWsClient should raise the error message
-        #       then display here according to the msg, such as cluster of the cluster id does not exist in account
         if args.cluster_id!=None and type(args.cluster_id) is str :
             jsonVMGroups = f2cWsClient.getClusterVMGroups(args.cluster_id)
             dictVMGroups = json.loads(jsonVMGroups)
@@ -549,8 +545,6 @@ examples:
         arg('--cluster-id', nargs='?', const=True, default=False, metavar='Cluster Id', help='Cluster Id, --cluster-id is required', required=True)
         
         args = parser.parse_args(sys.argv[2:])
-        #To Do: f2cWsClient should raise the error message
-        #       then display here according to the msg, such as cluster of the cluster id does not exist in account
         if args.cluster_id!=None and type(args.cluster_id) is str :
             jsonVMs = f2cWsClient.getClusterVms(args.cluster_id)
             dictVMs = json.loads(jsonVMs)
@@ -574,8 +568,6 @@ examples:
         arg('--cluster-vmgroup-id', nargs='?', const=True, default=False, metavar='VM Group Id', help='VM Group Id, --vmgroup-id is required', required=True)
         
         args = parser.parse_args(sys.argv[2:])
-        #To Do: f2cWsClient should raise the error message
-        #       then display here according to the msg, such as cluster of the cluster id or cluster vm group not exist in account
         if type(args.cluster_id) is str and type(args.cluster_vmgroup_id) is str:
             jsonVMs = f2cWsClient.getClusterVmGroupVMs(args.cluster_id, args.cluster_vmgroup_id)
             dictVMs = json.loads(jsonVMs)
@@ -599,8 +591,6 @@ examples:
         arg('--cluster-vm-id', nargs='?', const=True, default=False, metavar='Cluster VM Id', help='VM Group Id, --cluster-vm-id is required', required=True)
         
         args = parser.parse_args(sys.argv[2:])
-        #To Do: f2cWsClient should raise the error message
-        #       then display here according to the msg, such as cluster of the cluster id or cluster vm group not exist in account
         print 'Running executeScript, cluster_id=%s' % args.cluster_id
         pass
 
