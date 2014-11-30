@@ -32,11 +32,12 @@ cd fit2cloud-python-sdk
 
 说明
 ======================================
-   集群Id可以从Web控制台找到
-   虚拟机Id可以从listClusterVms命令结果中找到，或从Web控制台虚拟机列表页第一列，这个虚拟机Id为整数类型，如12168
-   ./f2cs.py listClusters
-   ./f2cs.py listClusterVmGroups --cluster-id=16
-   ./f2cs.py listClusterVms --cluster-id=16
-   ./f2cs.py listClusterVmGroupVms --cluster-id=16 --cluster-vmgroup-id=64
-   ./f2cs.py getServerInfo --cluster-id=16 --server-id=12168
+
+    集群Id可以从Web控制台找到
+    虚拟机Id可以从listClusterVms命令结果中找到，或从Web控制台虚拟机列表页第一列，这个虚拟机Id为整数类型，如12168
+    ./f2cs.py listClusters
+    ./f2cs.py listClusterVmGroups --cluster-id=16
+    ./f2cs.py listClusterVms --cluster-id=16
+    ./f2cs.py listClusterVmGroupVms --cluster-id=16 --cluster-vmgroup-id=64
+    ./f2cs.py getServerInfo --cluster-id=16 --server-id=12168
 
