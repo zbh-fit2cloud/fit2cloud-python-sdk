@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# coding=utf-8
 '''
 Created on Nov 29, 2014
 
@@ -6,17 +7,14 @@ Created on Nov 29, 2014
 '''
 
 import json
-#import oauth2 as oauth
-import base64
-import re
 import os
+import oauth2 as oauth
+import traceback
 
 class Server(object):
     '''
     classdocs
     '''
-
-
     def __init__(self):
         '''
         Constructor
@@ -101,6 +99,12 @@ class Server(object):
     
     def setVmId(self, vmId):
         self.vmId = vmId
+        
+    def getVmStatus(self):
+        return self.vmStatus
+    
+    def setVmStatus(self, vmStatus):
+        self.vmStatus = vmStatus
     
     def getRabbitmqQueue(self):
         return self.rabbitmqQueue
@@ -129,6 +133,7 @@ class Server(object):
         clusterRoleName = dictServer['clusterRoleName']
         region = dictServer['region']
         vmId = dictServer['vmId']
+        vmStatus = dictServer['vmStatus']
         rabbitmqQueue = dictServer['rabbitmqQueue']
         name = dictServer['name']
 
@@ -146,6 +151,7 @@ class Server(object):
         server.setClusterRoleName(clusterRoleName)
         server.setRegion(region)
         server.setVmId(vmId)
+        server.setVmStatus(vmStatus)
         server.setRabbitmqQueue(rabbitmqQueue)
         server.setName(name)
         
@@ -176,6 +182,7 @@ class Server(object):
         dictServer['clusterRoleName'] = self.clusterRoleName
         dictServer['region'] = self.region
         dictServer['vmId'] = self.vmId
+        dictServer['vmStatus'] = self.vmStatus
         dictServer['rabbitmqQueue'] = self.rabbitmqQueue
         dictServer['name'] = self.name
         
@@ -201,59 +208,66 @@ class F2CRestWSClient(object):
     
     def setSecretKey(self, secretKey):
         self.secretKey = secretKey
-    
-    def getClusterServers(self, clusterName):
-        endPoint = self.endPoint
-        accessKeyId = self.accessKeyId
-        secretKey = self.secretKey
-        clusterId = clusterName
-        url='%scluster/%s/servers' % (endPoint, clusterId)
-        #logger.info("url=%s" % url)
         
+    def getClusters(self):
+        url='%sclusters' % (self.endPoint)
         content = self.get(url, self.accessKeyId, self.secretKey)
         return content
         pass
     
-    def getClusterroleServersByName(self, clusterrole_name):
-        user_data = self.userDataDao.getUserData()
-        endPointURL = user_data.getQueryEnvURL()
-        key = user_data.getQueueServerUserName()
-        secret = user_data.getQueueServerPassword()
-        clusterId = user_data.getClusterID()
-        try:
-            clusterrole_id = self.getClusterroleId(clusterrole_name)
-            if(clusterrole_id!=None) :
-                url='%scluster/%s/clusterrole/%s/servers' % (endPointURL, clusterId, clusterrole_id)
-                #logger.info("url=%s" % url)
-                content = self.get(url, key, secret)
-                return content
-            else :
-                print "clusterrole %s does not exist in cluster." % clusterrole_name
-                return None
-        except Exception, e:
-            #to do, print proper friendly message according to exception
-            raise e
+    def getServer(self, clusterId, serverId):
+        url='%scluster/%s/server/%s' % (self.endPoint, clusterId, serverId)
+        content = self.get(url, self.accessKeyId, self.secretKey)
+        return content
+        pass
     
-    def getClusterroleServersById(self, clusterrole_id):
-        user_data = self.userDataDao.getUserData()
-        endPointURL = user_data.getQueryEnvURL()
-        key = user_data.getQueueServerUserName()
-        secret = user_data.getQueueServerPassword()
-        clusterId = user_data.getClusterID()
-        try:
-            if(clusterrole_id!=None) :
-                url='%scluster/%s/clusterrole/%s/servers' % (endPointURL, clusterId, clusterrole_id)
-                #logger.info("url=%s" % url)
-                content = self.get(url, key, secret)
-                return content
-            else :
-                print "clusterrole %s does not exist in cluster." % clusterrole_id
-                return None
-        except Exception, e:
-            #to do, print proper friendly message according to exception
-            raise e
+    def getClusterVMGroups(self, clusterId):
+        url='%scluster/%s/roles' % (self.endPoint, clusterId)
+        content = self.get(url, self.accessKeyId, self.secretKey)
+        return content
     
-    def getClusterroleId(self, clusterrole_name):
+    def getClusterVms(self, clusterId):
+        url='%scluster/%s/servers' % (self.endPoint, clusterId)
+        #logger.info("url=%s" % url)
+        
+        content = self.get(url, self.accessKeyId, self.secretKey)
+        
+        dictReturnServers=[]
+        
+        dictServers = json.loads(content)
+        if dictServers!=None and len(dictServers) > 0 :
+            for dictServer in dictServers : 
+                #print "--------------------------------"
+                server = Server.fromDict(dictServer)
+                if server.getVmStatus() == "Running" :
+                    dictReturnServers.append(dictServer)
+                    #print server.toJSON()
+                    pass
+            pass
+        
+        return json.dumps(dictReturnServers,indent=2) 
+    
+    def getClusterVmGroupVMs(self, clusterId, clusterVmGroupId):
+        url='%scluster/%s/clusterrole/%s/servers' % (self.endPoint, clusterId, clusterVmGroupId)
+        #logger.info("url=%s" % url)
+        content = self.get(url, self.accessKeyId, self.secretKey)
+        
+        dictReturnVMs=[]
+        
+        dictServers = json.loads(content)
+        if dictServers!=None and len(dictServers) > 0 :
+            for dictServer in dictServers : 
+                #print "--------------------------------"
+                server = Server.fromDict(dictServer)
+                if server.getVmStatus() == "Running" :
+                    dictReturnVMs.append(dictServer)
+                    #print server.toJSON()
+                    pass
+            pass
+        
+        return json.dumps(dictReturnVMs,indent=2) 
+    
+    def getClusterVmGroupId(self, cluster_vmgroup_name):
         clusterrole_id = None
         jsonClusterroles = self.getClusterRoles()
         if(jsonClusterroles!=None) :
@@ -262,35 +276,22 @@ class F2CRestWSClient(object):
                 for dictClusterrole in dictClusterroles:
                     if(dictClusterrole.has_key("name")) :
                         name =  dictClusterrole["name"]
-                        if(clusterrole_name==name) :
+                        if(cluster_vmgroup_name==name) :
                             clusterrole_id = dictClusterrole["id"]
             except Exception, e:
                 raise e
         return clusterrole_id
     
-    def getClusterRoles(self):
-        user_data = self.userDataDao.getUserData()
-        endPointURL = user_data.getQueryEnvURL()
-        key = user_data.getQueueServerUserName()
-        secret = user_data.getQueueServerPassword()
-        clusterId = user_data.getClusterID()
-        url='%scluster/%s/roles' % (endPointURL, clusterId)
-        content = self.get(url, key, secret)
-        return content
-    
     def get(self,url,key,secret):
-        #logger.debug("url:%s" % url)
-        #logger.debug("key:%s" % key)
-        #logger.debug("secret:%s" % secret)
         consumer = oauth.Consumer(key=key, secret=secret)
-        # token = oauth.Token(key=TOKEN_KEY, secret=TOKEN_SECRET)
         client = oauth.Client(consumer, None,  timeout=10)
-        client.ca_certs =  "%s/conf/cacert.pem" % Database.getAgentFolderDirPath()
+        current_dir = os.path.dirname(__file__)
+        client.ca_certs =  "%s/cacert.pem" % current_dir
+        #print client.ca_certs
         http_headers = {}
         #http_headers['X-Tradeshift-TenantId'] = TENANT_ID
         http_headers['User-Agent'] = 'MegaPythonAPIster 2.0'
         http_headers['Accept'] = 'application/json'
-        resp = None
         content = None
         try:
             resp, content = client.request(
@@ -302,6 +303,7 @@ class F2CRestWSClient(object):
             #logger.debug("content=%s" % content)
         except Exception, e :
             #logger.error(e)
+            traceback.print_exc()
             raise Exception(e)
             
         return content
@@ -310,7 +312,81 @@ import argparse
 import textwrap
 import sys
 
+class F2csConfig :
+    
+    def setEndpoint(self, endpoint):
+        self.endpoint = endpoint
+        
+    def setAccessKeyId(self, accessKeyId):
+        self.accessKeyId = accessKeyId
+    
+    def setSecretKey(self, secretKey):
+        self.secretKey = secretKey
+        
+    def getEndpoint(self):
+        return self.endpoint
+    
+    def getAccessKeyId(self):
+        return self.accessKeyId
+    
+    def getSecretKey(self):
+        return self.secretKey
+    
+    @staticmethod
+    def fromDict(dictF2csConfig):
+        endpoint = dictF2csConfig['endpoint']
+        accessKeyId = dictF2csConfig['accessKeyId']
+        secretKey = dictF2csConfig['secretKey']
+
+        f2csConfig = F2csConfig()
+        f2csConfig.setEndpoint(endpoint)
+        f2csConfig.setAccessKeyId(accessKeyId)
+        f2csConfig.setSecretKey(secretKey)
+
+        return f2csConfig
+    
+    @staticmethod
+    def fromJSON(jsonF2csConfig):
+        dictF2csConfig = json.loads(jsonF2csConfig)
+        return F2csConfig.fromDict(dictF2csConfig) 
+
+    def toJSON(self):
+        dictF2csConfig = self.toDict()
+        jsonF2csConfig = json.dumps(dictF2csConfig, indent=2)
+        return jsonF2csConfig
+    
+    def toDict(self):
+        dictF2csConfig = {}
+        dictF2csConfig['endpoint'] = self.endpoint
+        dictF2csConfig['accessKeyId'] = self.accessKeyId
+        dictF2csConfig['secretKey'] = self.secretKey
+        
+        return dictF2csConfig
+    pass
+
+class FileUtil:
+    
+    @staticmethod
+    def writeContent(file_path, content):
+        dir_path = os.path.dirname(file_path)
+        os.system("mkdir -p %s" % dir_path)
+        config_file = file(file_path, 'w')
+        config_file.write(content)
+        config_file.close()
+    
+    @staticmethod
+    def readContent(file_path):
+        config_file = file(file_path, 'r')
+        file_content = ""
+        file_lines = config_file.readlines();
+        for line in file_lines :
+            file_content = file_content + line
+        config_file.close()
+        return file_content
+
 class F2CS :
+    F2CSCONFIG_PATH = os.path.expanduser('~') + "/.f2cs/config"
+    
     def __init__(self):
         usage = '''
     ./f2cs.py <command> [<args>]
@@ -324,116 +400,209 @@ commands:
     getScriptLogs
 examples:
     ./f2cs.py config --endpoint=<endpoint> --id=<access key id> --secret=<access key secret>
-    ./f2cs.py listClusters --cluster-name=<cluster name>
-    ./f2cs.py listClusterVMGroups --cluster-name=<cluster name>
-    ./f2cs.py listClusterServers --cluster-name=<cluster name>
-    ./f2cs.py listClusterVMGroupServers --cluster-name=<cluster name> --cluster-vmgroup-name=<cluster vmgroup name>
-    ./f2cs.py executeScript --cluster-name=<cluster name> --cluster-vmgroup-name=<cluster vmgroup> --cluster-server-id=<cluster server id> --script-file=<script file path> 
-    ./f2cs.py getScriptLog --execution-id=<execution id>
+    ./f2cs.py listClusters
+    ./f2cs.py listClusterVMGroups --cluster-id=<cluster id>
+    ./f2cs.py listClusterVms --cluster-id=<cluster id>
+    ./f2cs.py listClusterVMGroupVMs --cluster-id=<cluster id> --cluster-vmgroup-id=<cluster vmgroup id>
+    ./f2cs.py getServerInfo --cluster-id=<cluster id> --server-id=<server id>
+    ./f2cs.py executeScript --cluster-id=<cluster id> --cluster-vmgroup-id=<cluster vmgroup id> --cluster-server-id=<cluster server id> --script-file=<script file path> 
     ./f2cs.py -h | --help
     ./f2cs.py -v | --version
         '''
+        
         parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      #description=textwrap.dedent(description),
                                      #epilog=textwrap.dedent(epilog),
                                      usage=usage
                                      )
-        parser.add_argument('command', metavar='command', help='Subcommand to run, config|listClusters|listClusterVMGroups|listClusterServers|listClusterVMGroupServers|executeScript|getScriptLogs')
+        parser.add_argument('command', metavar='command', help='命令, config|listClusters|listClusterVMGroups|listClusterVms|listClusterVMGroupVms|executeScript')
         parser.add_argument('-v', '--version', action='version', version='f2cs 1.0')
         # parse_args defaults to [1:] for args, but you need to
         # exclude the rest of the args too, or validation will fail
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
-            print 'Unrecognized command'
+            print '不支持该命令: %s' % args.command
             parser.print_help()
             exit(1)
         # use dispatch pattern to invoke method with same name
-        getattr(self, args.command)()
+        getattr(self, args.command)(args)
         
     def getF2CWSClient(self):
-        endPoint="https://aliyun.fit2cloud.com:8443/rest/"
-        accessKeyId="c2hlbnNpZHVhbnhpbmdAZ21haWwuY29t"
-        secretKey="15ea94ff-b59a-4727-8cee-045d6f359484"
-        f2cWSClient = F2CRestWSClient()
-        f2cWSClient.setEndpoint(endPoint)
-        f2cWSClient.setAccessKeyId(accessKeyId)
-        f2cWSClient.setSecretKey(secretKey)
+        #read from ~/.f2cs/config
+        f2cWSClient = None
+        if os.path.exists(self.F2CSCONFIG_PATH) :
+            jsonF2csConfig = FileUtil.readContent(self.F2CSCONFIG_PATH)
+            f2csConfig = F2csConfig.fromJSON(jsonF2csConfig)
+            
+            endPoint=f2csConfig.getEndpoint()
+            accessKeyId=f2csConfig.getAccessKeyId()
+            secretKey=f2csConfig.getSecretKey()
+            
+            f2cWSClient = F2CRestWSClient()
+            f2cWSClient.setEndpoint(endPoint)
+            f2cWSClient.setAccessKeyId(accessKeyId)
+            f2cWSClient.setSecretKey(secretKey)
         return f2cWSClient
         
-    def config(self):
+    def config(self, argv):
         parser = argparse.ArgumentParser(
-            description='Config FIT2Cloud Rest Service endpoint, access key id, secret key')
+            description='配置FIT2CLOUD Webservice API endpoint, access key id, secret key')
         # prefixing the argument with -- means it's optional
         arg = parser.add_argument
-        arg('--endpoint', nargs=1, const=True, default=False, metavar='Endpoint', help='Endpoint, --endpoint is required', required=True)
-        arg('--id', nargs=1, const=True, default=False, metavar='AccessKey Id', help='Access Key Id, --id is required', required=True)
-        arg('--secret', nargs=1, const=True, default=False, metavar='AccessKey Secret', help='Access Key Secret, --secret is required', required=True)
+        arg('--endpoint', nargs='?', const=True, default=False, metavar='Endpoint', help='Endpoint, --endpoint is required', required=True)
+        arg('--id', nargs='?', const=True, default=False, metavar='AccessKey Id', help='Access Key Id, --id is required', required=True)
+        arg('--secret', nargs='?', const=True, default=False, metavar='AccessKey Secret', help='Access Key Secret, --secret is required', required=True)
         # now that we're inside a subcommand, ignore the first
-        # TWO argvs, ie the command (git) and the subcommand (commit)
         args = parser.parse_args(sys.argv[2:])
+        f2csConfig = F2csConfig()
+        f2csConfig.setEndpoint(args.endpoint);
+        f2csConfig.setAccessKeyId(args.id)
+        f2csConfig.setSecretKey(args.secret)
         
-        print "config rest api key and secret"
-        print 'Running config, id=%s' % args.id
-        print 'Running config, secret=%s' % args.secret
+        jsonF2csConfig = f2csConfig.toJSON()
+        FileUtil.writeContent(self.F2CSCONFIG_PATH, jsonF2csConfig)
+        if os.path.exists(self.F2CSCONFIG_PATH) :
+            print "配置成功!"
+            print "~/.f2cs/config"
+            print FileUtil.readContent(self.F2CSCONFIG_PATH)
 
-    def listClusters(self):
-        parser = argparse.ArgumentParser(
-            description='List clusters of account')
-        arg = parser.add_argument
-        arg('--cluster-name', nargs='?', const=True, default=False, metavar='Cluster Name', help='Cluster Name, --cluster-name is required')
-        args = parser.parse_args(sys.argv[2:])
-        print 'Running listClusters, cluster_name=%s' % args.cluster_name
-        pass
+    def listClusters(self, argv):
+        f2cWsClient = self.getF2CWSClient()
+        if f2cWsClient==None :
+            self.printAPIConfigRequiredMsg()
+            sys.exit()
+            pass
+        
+        jsonClusters = f2cWsClient.getClusters()
+        dictClusters = json.loads(jsonClusters)
+        jsonClusters = json.dumps(dictClusters, indent=2)
+        print jsonClusters
     
-    def listClusterVMGroups(self):
+    def printAPIConfigRequiredMsg(self):
+        print "错误: "
+        print "     请首先配置apiEndpoint, access key id and secret key id"
+        print "例如: "
+        print "     ./f2cs.py config --endpoint=https://aliyun.fit2cloud.com:8443/rest/ --id=xxxx --secret=yyy"
+        print "参数说明: "
+        print "     1) 对于endpoint, 如果不是aliyun, 请将例子中aliyun替换成您使用的云的名称，如qingcloud,aws,azure"
+        print "     2) 对于access key id和secret key, 您可以从FIT2Cloud Web控制台找到, 点击右上角用户名，从下拉菜单中选择API信息"
+    
+    def getServerInfo(self, argv):
+        f2cWsClient = self.getF2CWSClient()
+        if f2cWsClient==None :
+            self.printAPIConfigRequiredMsg()
+            sys.exit()
+            pass
+        
         parser = argparse.ArgumentParser(
-            description='List clusters roles of specified cluster')
+            description='获取集群某Server信息，根据cluster id, server id')
         arg = parser.add_argument
-        arg('--cluster-name', nargs=1, const=True, default=False, metavar='Cluster Name', help='Cluster Name, --cluster-name is required', required=True)
+        arg('--cluster-id', nargs='?', const=True, default=False, metavar='Cluster Id', help='Cluster Id, --cluster-id is required', required=True)
+        arg('--server-id', nargs='?', const=True, default=False, metavar='Server Id', help='Server Id, --server-id is required', required=True)
         
         args = parser.parse_args(sys.argv[2:])
-        print 'Running listClusterRoles, cluster_name=%s' % args.cluster_name
+        if type(args.cluster_id) is str and type(args.server_id) is str:
+            jsonServer = f2cWsClient.getServer(args.cluster_id, args.server_id)
+            #To Do: f2cWsClient should raise the error message
+            #       then display here according to the msg, such as server id does not exist in account
+            dictServer=json.loads(jsonServer)
+            jsonServer = json.dumps(dictServer, indent=2)
+            print jsonServer
+        else :
+            print "错误: 请给出集群Id和虚拟机Id, 例如./f2cs.py getServerInfo --cluster-id=16 --server-id=12166"
         pass
     
-    def listClusterServers(self):
+    def listClusterVMGroups(self, argv):
+        f2cWsClient = self.getF2CWSClient()
+        if f2cWsClient==None :
+            self.printAPIConfigRequiredMsg()
+            sys.exit()
+            pass
+        
         parser = argparse.ArgumentParser(
-            description='List servers of specified cluster')
+            description='列出集群的所有虚拟机组')
         arg = parser.add_argument
-        arg('--cluster-name', nargs=1, const=True, default=False, metavar='Cluster Name', help='Cluster Name, --cluster-name is required', required=True)
+        arg('--cluster-id', nargs='?', const=True, default=False, metavar='Cluster Id', help='Cluster Id, --cluster-id is required', required=True)
         
         args = parser.parse_args(sys.argv[2:])
-        print 'Running listClusterServers, cluster_name=%s' % args.cluster_name
+        #To Do: f2cWsClient should raise the error message
+        #       then display here according to the msg, such as cluster of the cluster id does not exist in account
+        if args.cluster_id!=None and type(args.cluster_id) is str :
+            jsonVMGroups = f2cWsClient.getClusterVMGroups(args.cluster_id)
+            dictVMGroups = json.loads(jsonVMGroups)
+            jsonVMGroups = json.dumps(dictVMGroups, indent=2)
+            print jsonVMGroups
+        else :
+            print "错误: 请给出集群Id参数, 例如./f2cs.py listClusterVMGroups --cluster-id=16"
         pass
     
-    def listClusterVMGroupServers(self):
+    def listClusterVms(self, argv):
+        f2cWsClient = self.getF2CWSClient()
+        if f2cWsClient==None :
+            self.printAPIConfigRequiredMsg()
+            sys.exit()
+            pass
+        
+        parser = argparse.ArgumentParser(
+            description='列出集群中的所有虚拟机')
+        arg = parser.add_argument
+        arg('--cluster-id', nargs='?', const=True, default=False, metavar='Cluster Id', help='Cluster Id, --cluster-id is required', required=True)
+        
+        args = parser.parse_args(sys.argv[2:])
+        #To Do: f2cWsClient should raise the error message
+        #       then display here according to the msg, such as cluster of the cluster id does not exist in account
+        if args.cluster_id!=None and type(args.cluster_id) is str :
+            jsonVMs = f2cWsClient.getClusterVms(args.cluster_id)
+            dictVMs = json.loads(jsonVMs)
+            jsonVMs = json.dumps(dictVMs, indent=2)
+            print jsonVMs
+        else :
+            print "错误: 请给出集群Id参数, 例如./f2cs.py listClusterVms --cluster-id=16"
+        pass
+    
+    def listClusterVMGroupVMs(self, argv):
+        f2cWsClient = self.getF2CWSClient()
+        if f2cWsClient==None :
+            self.printAPIConfigRequiredMsg()
+            sys.exit()
+            pass
+        
         parser = argparse.ArgumentParser(
             description='List servers of specified cluster VM Group')
         arg = parser.add_argument
-        arg('--cluster-name', nargs=1, const=True, default=False, metavar='Cluster Name', help='Cluster Name, --cluster-name is required', required=True)
-        arg('--vmgroup-name', nargs='?', const=True, default=False, metavar='VM Group Name', help='VM Group Name, --vmgroup-name is required', required=True)
+        arg('--cluster-id', nargs='?', const=True, default=False, metavar='Cluster Id', help='Cluster Id, --cluster-id is required', required=True)
+        arg('--cluster-vmgroup-id', nargs='?', const=True, default=False, metavar='VM Group Id', help='VM Group Id, --vmgroup-id is required', required=True)
         
         args = parser.parse_args(sys.argv[2:])
-        print 'Running listClusterVMGroupServers, cluster_name=%s' % args.cluster_name
-        print 'Running listClusterVMGroupServers, cluster_name=%s' % args.cluster_name
-        pass
+        #To Do: f2cWsClient should raise the error message
+        #       then display here according to the msg, such as cluster of the cluster id or cluster vm group not exist in account
+        if type(args.cluster_id) is str and type(args.cluster_vmgroup_id) is str:
+            jsonVMs = f2cWsClient.getClusterVmGroupVMs(args.cluster_id, args.cluster_vmgroup_id)
+            dictVMs = json.loads(jsonVMs)
+            jsonVMs = json.dumps(dictVMs, indent=2)
+            print jsonVMs
+        else :
+            print "错误: 请给出集群Id参数及集群虚拟机组Id, 例如./f2cs.py listClusterVMGroupVMs --cluster-id=16 --cluster-vmgroup-id=64"
     
-    def executeScript(self):
+    def executeScript(self, argv):
+        f2cWsClient = self.getF2CWSClient()
+        if f2cWsClient==None :
+            self.printAPIConfigRequiredMsg()
+            sys.exit()
+            pass
+        
         parser = argparse.ArgumentParser(
             description='execute script on specified cluster all servers, cluster vmgroup servers, a server in specified cluster')
         arg = parser.add_argument
-        arg('--cluster-name', nargs=1, const=True, default=False, metavar='Cluster Name', help='Cluster Name, --cluster-name is required', required=True)
-        arg('--vmgroup-name', nargs='?', const=True, default=False, metavar='VM Group Name', help='VM Group Name, --vmgroup-name is required', required=True)
+        arg('--cluster-id', nargs='?', const=True, default=False, metavar='Cluster Id', help='Cluster Id, --cluster-id is required', required=True)
+        arg('--cluster-vmgroup-id', nargs='?', const=True, default=False, metavar='Cluster VM Group Id', help='VM Group Id, --cluster-vmgroup-id is required', required=True)
+        arg('--cluster-vm-id', nargs='?', const=True, default=False, metavar='Cluster VM Id', help='VM Group Id, --cluster-vm-id is required', required=True)
         
         args = parser.parse_args(sys.argv[2:])
-        print 'Running executeScript, cluster_name=%s' % args.cluster_name
-        print 'Running executeScript, cluster_name=%s' % args.cluster_name
-        pass
-    
-    def getScriptLogs(self):
-        parser = argparse.ArgumentParser(
-            description='get script execution scripts logs on specified cluster all servers, cluster vmgroup servers, a server in specified cluster')
-        arg = parser.add_argument
-        print 'Running getScriptExecutionLogs'
+        #To Do: f2cWsClient should raise the error message
+        #       then display here according to the msg, such as cluster of the cluster id or cluster vm group not exist in account
+        print 'Running executeScript, cluster_id=%s' % args.cluster_id
+        print 'Running executeScript, vmgroup_id=%s' % args.vmgroup_id
         pass
 
 if __name__ == "__main__":
