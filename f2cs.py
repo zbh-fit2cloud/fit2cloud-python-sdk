@@ -325,7 +325,7 @@ commands:
 examples:
     ./f2cs.py config --endpoint=<endpoint> --id=<access key id> --secret=<access key secret>
     ./f2cs.py listClusters --cluster-name=<cluster name>
-    ./f2cs.py listClusterRoles --cluster-name=<cluster name>
+    ./f2cs.py listClusterVMGroups --cluster-name=<cluster name>
     ./f2cs.py listClusterServers --cluster-name=<cluster name>
     ./f2cs.py listClusterVMGroupServers --cluster-name=<cluster name> --cluster-vmgroup-name=<cluster vmgroup name>
     ./f2cs.py executeScript --cluster-name=<cluster name> --cluster-vmgroup-name=<cluster vmgroup> --cluster-server-id=<cluster server id> --script-file=<script file path> 
