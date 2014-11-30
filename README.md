@@ -36,7 +36,7 @@ cd fit2cloud-python-sdk
     集群Id可以从Web控制台找到
     虚拟机Id可以从listClusterVms命令结果中找到，或从Web控制台虚拟机列表页第一列，这个虚拟机Id为整数类型，如12168
     acccess key id和access key secret可以从Web控制台找到，点击右上角用户名，从下拉菜单中选择API信息.
-    ./f2cs.py config --endpoint=https://aliyun.fit2cloud.com:8443/rest/ --id=<access key id> --secret=<access key secret>
+    ./f2cs.py config --endpoint=https://aliyun.fit2cloud.com:8443/rest/ --id=Km20dL0jaJ91XebnbWFpbC5jb20= --secret=3e27563j-e362-4v11-b222-c453dyc70768
     ./f2cs.py listClusters
     ./f2cs.py listClusterVmGroups --cluster-id=16
     ./f2cs.py listClusterVms --cluster-id=16
