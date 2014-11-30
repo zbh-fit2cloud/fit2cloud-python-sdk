@@ -602,7 +602,6 @@ examples:
         #To Do: f2cWsClient should raise the error message
         #       then display here according to the msg, such as cluster of the cluster id or cluster vm group not exist in account
         print 'Running executeScript, cluster_id=%s' % args.cluster_id
-        print 'Running executeScript, vmgroup_id=%s' % args.vmgroup_id
         pass
 
 if __name__ == "__main__":
