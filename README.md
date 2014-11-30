@@ -46,8 +46,8 @@ cd fit2cloud-python-sdk
 输出示例
 ======================================
 
-./f2cs.py listClusters
-[
+ ./f2cs.py listClusters
+ [
   {
     "status": "TERMINATED",
     "credentialName": "default-key",
@@ -127,11 +127,11 @@ cd fit2cloud-python-sdk
     "groupId": 32,
     "launched": 1417227130000,
     "description": ""
-  }
-]
+   }
+ ]
 
-./f2cs.py listClusterVMGroups --cluster-id=16
-[
+ ./f2cs.py listClusterVMGroups --cluster-id=16
+ [
   {
     "vmNumber": 1,
     "loadBalancerBandwidth": 1000,
@@ -243,11 +243,11 @@ cd fit2cloud-python-sdk
     "loadBalancerPublicIp": null,
     "created": 1409406678000,
     "region": "cn-shenzhen"
-  }
-]
+   }
+ ]
 
-./f2cs.py listClusterVms --cluster-id=16
-[
+ ./f2cs.py listClusterVms --cluster-id=16
+ [
   {
     "backendCreated": false,
     "serverRoleId": 31,
@@ -332,10 +332,10 @@ cd fit2cloud-python-sdk
     "cloudId": 2,
     "deleted": null
   }
-]
+ ]
 
-./f2cs.py listClusterVMGroupVMs --cluster-id=16 --cluster-vmgroup-id=64
-[
+ ./f2cs.py listClusterVMGroupVMs --cluster-id=16 --cluster-vmgroup-id=64
+ [
   {
     "backendCreated": false,
     "serverRoleId": 30,
@@ -377,11 +377,11 @@ cd fit2cloud-python-sdk
     "region": "cn-beijing",
     "cloudId": 2,
     "deleted": null
-  }
-]
+   }
+ ]
 
-./f2cs.py getServerInfo --cluster-id=16 --server-id=12168
-{
+ ./f2cs.py getServerInfo --cluster-id=16 --server-id=12168
+ {
   "backendCreated": false,
   "serverRoleId": 30,
   "vmId": "i-25e3mowze",
@@ -422,5 +422,5 @@ cd fit2cloud-python-sdk
   "region": "cn-beijing",
   "cloudId": 2,
   "deleted": null
-}
+ }
 
