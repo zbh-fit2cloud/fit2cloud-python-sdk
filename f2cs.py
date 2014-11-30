@@ -393,17 +393,17 @@ class F2CS :
 commands:
     config
     listClusters
-    listClusterVMGroups
+    listClusterVmGroups
     listClusterServers
-    listClusterVMGroupServers
+    listClusterVmGroupServers
     executeScript
     getScriptLogs
 examples:
     ./f2cs.py config --endpoint=<endpoint> --id=<access key id> --secret=<access key secret>
     ./f2cs.py listClusters
-    ./f2cs.py listClusterVMGroups --cluster-id=<cluster id>
+    ./f2cs.py listClusterVmGroups --cluster-id=<cluster id>
     ./f2cs.py listClusterVms --cluster-id=<cluster id>
-    ./f2cs.py listClusterVMGroupVMs --cluster-id=<cluster id> --cluster-vmgroup-id=<cluster vmgroup id>
+    ./f2cs.py listClusterVmGroupVms --cluster-id=<cluster id> --cluster-vmgroup-id=<cluster vmgroup id>
     ./f2cs.py getServerInfo --cluster-id=<cluster id> --server-id=<server id>
     ./f2cs.py executeScript --cluster-id=<cluster id> --cluster-vmgroup-id=<cluster vmgroup id> --cluster-server-id=<cluster server id> --script-file=<script file path> 
     ./f2cs.py -h | --help
@@ -415,7 +415,7 @@ examples:
                                      #epilog=textwrap.dedent(epilog),
                                      usage=usage
                                      )
-        parser.add_argument('command', metavar='command', help='命令, config|listClusters|listClusterVMGroups|listClusterVms|listClusterVMGroupVms|executeScript')
+        parser.add_argument('command', metavar='command', help='命令, config|listClusters|listClusterVmGroups|listClusterVms|listClusterVmGroupVms')
         parser.add_argument('-v', '--version', action='version', version='f2cs 1.0')
         # parse_args defaults to [1:] for args, but you need to
         # exclude the rest of the args too, or validation will fail
@@ -512,7 +512,7 @@ examples:
             print "错误: 请给出集群Id和虚拟机Id, 例如./f2cs.py getServerInfo --cluster-id=16 --server-id=12166"
         pass
     
-    def listClusterVMGroups(self, argv):
+    def listClusterVmGroups(self, argv):
         f2cWsClient = self.getF2CWSClient()
         if f2cWsClient==None :
             self.printAPIConfigRequiredMsg()
@@ -533,7 +533,7 @@ examples:
             jsonVMGroups = json.dumps(dictVMGroups, indent=2)
             print jsonVMGroups
         else :
-            print "错误: 请给出集群Id参数, 例如./f2cs.py listClusterVMGroups --cluster-id=16"
+            print "错误: 请给出集群Id参数, 例如./f2cs.py listClusterVmGroups --cluster-id=16"
         pass
     
     def listClusterVms(self, argv):
@@ -560,7 +560,7 @@ examples:
             print "错误: 请给出集群Id参数, 例如./f2cs.py listClusterVms --cluster-id=16"
         pass
     
-    def listClusterVMGroupVMs(self, argv):
+    def listClusterVmGroupVms(self, argv):
         f2cWsClient = self.getF2CWSClient()
         if f2cWsClient==None :
             self.printAPIConfigRequiredMsg()
@@ -582,7 +582,7 @@ examples:
             jsonVMs = json.dumps(dictVMs, indent=2)
             print jsonVMs
         else :
-            print "错误: 请给出集群Id参数及集群虚拟机组Id, 例如./f2cs.py listClusterVMGroupVMs --cluster-id=16 --cluster-vmgroup-id=64"
+            print "错误: 请给出集群Id参数及集群虚拟机组Id, 例如./f2cs.py listClusterVmGroupVms --cluster-id=16 --cluster-vmgroup-id=64"
     
     def executeScript(self, argv):
         f2cWsClient = self.getF2CWSClient()
