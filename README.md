@@ -16,8 +16,8 @@ cd fit2cloud-python-sdk
     config
     listClusters
     listClusterVmGroups
-    listClusterServers
-    listClusterVmGroupServers
+    listClusterVms
+    listClusterVmGroupVms
 
 例子
 ======================================
