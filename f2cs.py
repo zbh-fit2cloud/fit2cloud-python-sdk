@@ -397,7 +397,7 @@ commands:
     listClusterServers
     listClusterVmGroupServers
     executeScript
-    getScriptLogs
+
 examples:
     ./f2cs.py config --endpoint=<endpoint> --id=<access key id> --secret=<access key secret>
     ./f2cs.py listClusters
