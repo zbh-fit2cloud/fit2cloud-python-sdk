@@ -20,14 +20,14 @@ cd fit2cloud-python-sdk
 ```
     config
     listClusters
+    getCluster
     listClusterVmGroups
+    getClusterVmGroup
+    setClusterVmGroupSize
     listClusterVms
     listClusterVmGroupVms
-    getCluster
     launchCluster
     shutdownCluster
-    setClusterVmGroupSize
-    getClusterVmGroup
 ```
 
 ###例子
