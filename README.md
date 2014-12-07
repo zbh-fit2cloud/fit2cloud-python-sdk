@@ -22,7 +22,7 @@ cd fit2cloud-python-sdk
     listClusters
     listClusterVmGroups
     listClusterVms
-    listClusterVmGroupServers
+    listClusterVmGroupVms
     getCluster
     launchCluster
     shutdownCluster
