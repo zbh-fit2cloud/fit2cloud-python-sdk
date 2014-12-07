@@ -7,6 +7,8 @@
 git@github.com:fit2cloud/fit2cloud-python-sdk.git
 cd fit2cloud-python-sdk
 
+用法: ./f2cs.py <command> [<args>]
+
 1. 配置命令行的API Key和Secret
 ./f2cs.py config --cloud-provider=aliyun --id=c2glcnNqZHVhbirbnbmdAZ21haWwuY29t --secret=15xxxxx4ff-xxxx-4727-8xxx-045dxxx59484
 
