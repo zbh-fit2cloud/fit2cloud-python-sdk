@@ -4,6 +4,8 @@ fit2cloud-python-sdk
 ###安装
 
 ```
+#python版本>=2.7
+
 git clone git@github.com:fit2cloud/fit2cloud-python-sdk.git
 cd fit2cloud-python-sdk
 ./f2cs.py <command> [<args>]
