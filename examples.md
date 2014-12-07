@@ -1,5 +1,5 @@
 
-##示例:
+####示例:
 
 ```
 1. 配置命令行的API Key和Secret
@@ -30,8 +30,7 @@
 ./f2cs.py launchCluster --cluster-name=wordpress-all-in-one
 ```
 
-1. 配置命令行的API Key和Secret
-======================================
+####1. 配置命令行的API Key和Secret
 
 ```
 $./f2cs.py config --cloud-provider=aliyun --id=c2glcnNqZHVhbirbnbmdAZ21haWwuY29t --secret=15xxxxx4ff-xxxx-4727-8xxx-045dxxx59484
@@ -42,8 +41,7 @@ $./f2cs.py config --cloud-provider=aliyun --id=c2glcnNqZHVhbirbnbmdAZ21haWwuY29t
 }
 ```
 
-2. 列出用户的某CloudProvider下所有集群
-======================================
+####2. 列出用户的某CloudProvider下所有集群
 
 ```
 $ ./f2cs.py listClusters
@@ -71,8 +69,7 @@ $ ./f2cs.py listClusters
 ]
 ```
 
-3. 获取某集群虚拟机组信息
-======================================
+####3. 获取某集群虚拟机组信息
 
 ```
 $ ./f2cs.py getClusterVmGroup --cluster-name=wordpress-all-in-one --vmgroup-name=wd-all-in-one
@@ -105,8 +102,7 @@ $ ./f2cs.py getClusterVmGroup --cluster-name=wordpress-all-in-one --vmgroup-name
 ]
 ```
 
-4. 设置某集群虚拟机组大小，即虚拟机数量
-======================================
+####4. 设置某集群虚拟机组大小，即虚拟机数量
 
 ```
 $ ./f2cs.py setClusterVmGroupSize --cluster-name=wordpress-all-in-one --vmgroup-name=wd-all-in-one --size=2
@@ -116,8 +112,7 @@ $ ./f2cs.py setClusterVmGroupSize --cluster-name=wordpress-all-in-one --vmgroup-
 }
 ```
 
-5. 获取集群信息，通过集群名称
-======================================
+####5. 获取集群信息，通过集群名称
 
 ```
 $ ./f2cs.py getCluster --cluster-name=wordpress-all-in-one
@@ -147,8 +142,7 @@ $ ./f2cs.py getCluster --cluster-name=wordpress-dev1
 }
 ```
 
-5. 列出集群内虚拟机组信息，通过集群名称
-============================================================================
+####5. 列出集群内虚拟机组信息，通过集群名称
 
 ```
 $ ./f2cs.py listClusterVmGroups --cluster-name=wordpress-all-in-one
@@ -206,8 +200,7 @@ $ ./f2cs.py listClusterVmGroups --cluster-name=wordpress-all-in-one
 ]
 ```
 
-6. 列出集群内所有虚拟机，通过集群名称
-============================================================================
+####6. 列出集群内所有虚拟机，通过集群名称
 
 ```
 $ ./f2cs.py listClusterVms --cluster-name=wordpress-all-in-one
@@ -290,8 +283,7 @@ $ ./f2cs.py listClusterVms --cluster-name=wordpress-all-in-one
 ]
 ```
 
-7. 获取集群信息
-========================================
+####7. 获取集群信息
 
 ```
 $ ./f2cs.py getCluster --cluster-name=wordpress-all-in-one
@@ -314,8 +306,7 @@ $ ./f2cs.py getCluster --cluster-name=wordpress-all-in-one
 }
 ```
 
-8. 关闭集群
-========================================
+####8. 关闭集群
 
 ```
 $ ./f2cs.py shutdownCluster --cluster-name=wordpress-all-in-one
@@ -325,8 +316,7 @@ $ ./f2cs.py shutdownCluster --cluster-name=wordpress-all-in-one
 }
 ```
 
-9. 启动集群
-========================================
+####9. 启动集群
 
 ```
 $ ./f2cs.py launchCluster --cluster-name=wordpress-all-in-one
