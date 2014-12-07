@@ -106,12 +106,6 @@ class Server(object):
     def setVmStatus(self, vmStatus):
         self.vmStatus = vmStatus
     
-    def getRabbitmqQueue(self):
-        return self.rabbitmqQueue
-    
-    def setRabbitmqQueue(self, rabbitmqQueue):
-        self.rabbitmqQueue = rabbitmqQueue
-    
     def getName(self):
         return self.name
     
@@ -134,7 +128,6 @@ class Server(object):
         region = dictServer['region']
         vmId = dictServer['vmId']
         vmStatus = dictServer['vmStatus']
-        rabbitmqQueue = dictServer['rabbitmqQueue']
         name = dictServer['name']
 
         server = Server()
@@ -152,7 +145,6 @@ class Server(object):
         server.setRegion(region)
         server.setVmId(vmId)
         server.setVmStatus(vmStatus)
-        server.setRabbitmqQueue(rabbitmqQueue)
         server.setName(name)
         
         return server
@@ -183,7 +175,6 @@ class Server(object):
         dictServer['region'] = self.region
         dictServer['vmId'] = self.vmId
         dictServer['vmStatus'] = self.vmStatus
-        dictServer['rabbitmqQueue'] = self.rabbitmqQueue
         dictServer['name'] = self.name
         
         return dictServer
@@ -247,6 +238,7 @@ class F2CRestWSClient(object):
                 #print "--------------------------------"
                 server = Server.fromDict(dictServer)
                 if server.getVmStatus() == "Running" :
+                    dictServer.pop("rabbitmqQueue", None)
                     dictReturnServers.append(dictServer)
                     #print server.toJSON()
                     pass
@@ -274,6 +266,7 @@ class F2CRestWSClient(object):
                 #print "--------------------------------"
                 server = Server.fromDict(dictServer)
                 if server.getVmStatus() == "Running" :
+                    dictServer.pop("rabbitmqQueue", None)
                     dictReturnVMs.append(dictServer)
                     #print server.toJSON()
                     pass
