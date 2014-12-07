@@ -39,20 +39,20 @@ cd fit2cloud-python-sdk
 2. 列出用户的某CloudProvider下所有集群
 ./f2cs.py listClusters
 
-3. 获取某集群虚拟机组信息
+3. 列出某集群所有虚拟机组信息
 ./f2cs.py listClusterVmGroups --cluster-name=wordpress-all-in-one
 
 4. 设置某集群虚拟机组大小，即虚拟机数量
-./f2cs.py listClusterVms --cluster-name=wordpress-all-in-one
+./f2cs.py setClusterVmGroupSize --cluster-name=wordpress-all-in-one --vmgroup-name=wd-all-in-one --size=2
 
 5. 获取集群信息，通过集群名称
 ./f2cs.py getCluster --cluster-name=wordpress-all-in-one
 
 6. 列出集群内所有虚拟机，通过集群名称
-./f2cs.py getClusterVmGroup --cluster-name=wordpress-all-in-one --vmgroup-name=wd-all-in-one
+./f2cs.py listClusterVms --cluster-name=wordpress-all-in-one
 
-7. 获取集群信息
-./f2cs.py setClusterVmGroupSize --cluster-name=wordpress-all-in-one --vmgroup-name=wd-all-in-one --size=2
+7. 获取集群某虚拟机组信息
+./f2cs.py getClusterVmGroup --cluster-name=wordpress-all-in-one --vmgroup-name=wd-all-in-one
 
 8. 关闭集群
 ./f2cs.py shutdownCluster --cluster-name=wordpress-all-in-one
