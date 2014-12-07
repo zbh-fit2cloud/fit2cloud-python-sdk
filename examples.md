@@ -3,6 +3,7 @@
 
 ```
 
+先把CLI下载到本地
 git@github.com:fit2cloud/fit2cloud-python-sdk.git
 cd fit2cloud-python-sdk
 
