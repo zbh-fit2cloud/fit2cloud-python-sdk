@@ -574,7 +574,7 @@ class F2CS :
                 sys.exit()
             
             f2csConfig = F2csConfig()
-            endPoint = "https://%s.fit2cloud.com:8443/rest" % args.cloud_provider
+            endPoint = "https://%s.fit2cloud.com:8443/rest/" % args.cloud_provider
             f2csConfig.setEndpoint(endPoint);
             f2csConfig.setAccessKeyId(args.id)
             f2csConfig.setSecretKey(args.secret)
