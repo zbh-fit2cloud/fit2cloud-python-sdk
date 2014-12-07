@@ -2,6 +2,7 @@
 示例:
 ======================================
 
+```
 ./f2cs.py config --cloud-provider=aliyun --id=c2glcnNqZHVhbirbnbmdAZ21haWwuY29t --secret=15xxxxx4ff-xxxx-4727-8xxx-045dxxx59484
 ./f2cs.py listClusters
 ./f2cs.py listClusterVmGroups --cluster-name=wordpress-all-in-one
@@ -11,7 +12,7 @@
 ./f2cs.py setClusterVmGroupSize --cluster-name=wordpress-all-in-one --vmgroup-name=wd-all-in-one --size=2
 ./f2cs.py shutdownCluster --cluster-name=wordpress-all-in-one
 ./f2cs.py launchCluster --cluster-name=wordpress-all-in-one
-
+```
 
 1. 配置命令行的API Key和Secret
 ======================================
