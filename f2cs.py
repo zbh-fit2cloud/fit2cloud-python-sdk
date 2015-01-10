@@ -397,9 +397,9 @@ class F2csConfig :
     
     @staticmethod
     def fromDict(dictF2csConfig):
-        endpoint = dictF2csConfig['endpoint']
-        accessKeyId = dictF2csConfig['accessKeyId']
-        secretKey = dictF2csConfig['secretKey']
+        endpoint = dictF2csConfig['restapi_endpoint']
+        accessKeyId = dictF2csConfig['consumer_key']
+        secretKey = dictF2csConfig['secret_key']
 
         f2csConfig = F2csConfig()
         f2csConfig.setEndpoint(endpoint)
@@ -420,9 +420,9 @@ class F2csConfig :
     
     def toDict(self):
         dictF2csConfig = {}
-        dictF2csConfig['endpoint'] = self.endpoint
-        dictF2csConfig['accessKeyId'] = self.accessKeyId
-        dictF2csConfig['secretKey'] = self.secretKey
+        dictF2csConfig['restapi_endpoint'] = self.endpoint
+        dictF2csConfig['consumer_key'] = self.accessKeyId
+        dictF2csConfig['secret_key'] = self.secretKey
         
         return dictF2csConfig
     pass
@@ -448,14 +448,13 @@ class FileUtil:
         return file_content
 
 class F2CS :
-    F2CSCONFIG_PATH = os.path.expanduser('~') + "/.f2cs/config"
+    F2CSCONFIG_PATH = "/etc/fit2cloud/userdata.txt"
     
     def __init__(self):
         usage = '''
 用法:
     ./f2cs.py <command> [<args>]
 命令:
-    config
     listClusters
     listClusterVmGroups
     listClusterVms
@@ -465,10 +464,7 @@ class F2CS :
     shutdownCluster
     setClusterVmGroupSize
     getClusterVmGroup
-示例:
-    #配置f2cs CLI API密钥
-        ./f2cs.py config --cloud-provider=<cloudprovider, aliyun | aws | qingcloud | azure> --id=<access key id> --secret=<access key secret>
-    
+示例:   
     #列出用户下的所有集群
         ./f2cs.py listClusters    
     
@@ -524,6 +520,28 @@ class F2CS :
             exit(1)
         # use dispatch pattern to invoke method with same name
         getattr(self, args.command)(args)
+    
+    def config(self, argv):
+        parser = argparse.ArgumentParser(
+            description='配置FIT2CLOUD Webservice API endpoint, access key id, secret key')
+        # prefixing the argument with -- means it's optional
+        arg = parser.add_argument
+        arg('--endpoint', nargs='?', const=True, default=False, metavar='Endpoint', help='Endpoint, --endpoint is required', required=True)
+        arg('--id', nargs='?', const=True, default=False, metavar='AccessKey Id', help='Access Key Id, --id is required', required=True)
+        arg('--secret', nargs='?', const=True, default=False, metavar='AccessKey Secret', help='Access Key Secret, --secret is required', required=True)
+        # now that we're inside a subcommand, ignore the first
+        args = parser.parse_args(sys.argv[2:])
+        f2csConfig = F2csConfig()
+        f2csConfig.setEndpoint(args.endpoint);
+        f2csConfig.setAccessKeyId(args.id)
+        f2csConfig.setSecretKey(args.secret)
+        
+        jsonF2csConfig = f2csConfig.toJSON()
+        FileUtil.writeContent(self.F2CSCONFIG_PATH, jsonF2csConfig)
+        if os.path.exists(self.F2CSCONFIG_PATH) :
+            print "配置成功!"
+            print "~/.f2cs/config"
+            print FileUtil.readContent(self.F2CSCONFIG_PATH)
         
     def getF2CWSClient(self):
         #read from ~/.f2cs/config
@@ -541,46 +559,6 @@ class F2CS :
             f2cWSClient.setAccessKeyId(accessKeyId)
             f2cWSClient.setSecretKey(secretKey)
         return f2cWSClient
-        
-    def config(self, argv):
-        parser = argparse.ArgumentParser(
-            description='配置FIT2CLOUD Webservice API endpoint, access key id, secret key')
-        # prefixing the argument with -- means it's optional
-        arg = parser.add_argument
-        arg('--cloud-provider', nargs='?', const=True, default=False, metavar='Cloud Provider', help='Cloud Provider, --cloud-provider is required', required=True)
-        arg('--id', nargs='?', const=True, default=False, metavar='AccessKey Id', help='Access Key Id, --id is required', required=True)
-        arg('--secret', nargs='?', const=True, default=False, metavar='AccessKey Secret', help='Access Key Secret, --secret is required', required=True)
-        # now that we're inside a subcommand, ignore the first
-        args = parser.parse_args(sys.argv[2:])
-        
-        if type(args.cloud_provider) is str and type(args.id) is str and type(args.secret) is str and \
-           len(args.cloud_provider) > 0 and len(args.id) > 0 and len(args.secret) > 0 :
-            cloudProviders = []
-            cloudProviders.append("aliyun")
-            cloudProviders.append("qingcloud")
-            cloudProviders.append("aws")
-            cloudProviders.append("azure")
-            
-            if args.cloud_provider not in cloudProviders:
-                print "Cloud provider %s is not supported, below are the support list"
-                print cloudProviders
-                sys.exit()
-            
-            f2csConfig = F2csConfig()
-            endPoint = "https://%s.fit2cloud.com:8443/rest/" % args.cloud_provider
-            f2csConfig.setEndpoint(endPoint);
-            f2csConfig.setAccessKeyId(args.id)
-            f2csConfig.setSecretKey(args.secret)
-            
-            jsonF2csConfig = f2csConfig.toJSON()
-            FileUtil.writeContent(self.F2CSCONFIG_PATH, jsonF2csConfig)
-            if os.path.exists(self.F2CSCONFIG_PATH) :
-                print "配置成功!"
-                print "~/.f2cs/config"
-                print FileUtil.readContent(self.F2CSCONFIG_PATH)
-                pass
-        else :
-            print "错误: 请给出CloudProvider和API access key and secret, 例如./f2cs.py --cloud-provider=aliyun --id=xxxxx --secret=yyyyy"
 
     def listClusters(self, argv):
         f2cWsClient = self.getF2CWSClient()
