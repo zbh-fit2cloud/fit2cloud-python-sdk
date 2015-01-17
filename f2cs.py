@@ -455,6 +455,7 @@ class F2CS :
 用法:
     ./f2cs.py <command> [<args>]
 命令:
+    config
     listClusters
     listClusterVmGroups
     listClusterVms
@@ -509,7 +510,7 @@ class F2CS :
                                      usage=usage
                                      )
         parser.add_argument('command', metavar='command', help='命令, config|listClusters|listClusterVmGroups|listClusterVms|listClusterVmGroupVms')
-        parser.add_argument('-v', '--version', action='version', version='f2cs 1.0')
+        parser.add_argument('-v', '--version', action='version', version='f2c CLI: v0.2')
         # parse_args defaults to [1:] for args, but you need to
         # exclude the rest of the args too, or validation will fail
         #./f2cs.py executeScript --cluster-id=<cluster id> --cluster-vmgroup-id=<cluster vmgroup id> --cluster-server-id=<cluster server id> --script-file=<script file path> 
@@ -526,7 +527,7 @@ class F2CS :
             description='配置FIT2CLOUD Webservice API endpoint, access key id, secret key')
         # prefixing the argument with -- means it's optional
         arg = parser.add_argument
-        arg('--endpoint', nargs='?', const=True, default=False, metavar='Endpoint', help='Endpoint, --endpoint is required', required=True)
+        arg('--endpoint', nargs='?', const=True, default=False, metavar='Endpoint', help='Endpoint, --endpoint is required, 内容请见: Web控制台用户名 -> API信息-> API Enpoint，如https://aliyun.fit2cloud.com:8443/rest/', required=True)
         arg('--id', nargs='?', const=True, default=False, metavar='AccessKey Id', help='Access Key Id, --id is required', required=True)
         arg('--secret', nargs='?', const=True, default=False, metavar='AccessKey Secret', help='Access Key Secret, --secret is required', required=True)
         # now that we're inside a subcommand, ignore the first
