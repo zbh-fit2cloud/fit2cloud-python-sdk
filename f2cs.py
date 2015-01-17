@@ -448,7 +448,7 @@ class FileUtil:
         return file_content
 
 class F2CS :
-    F2CSCONFIG_PATH = "/etc/fit2cloud/userdata.txt"
+    F2CSCONFIG_PATH = CONFIGFILE = os.path.expanduser('~') + '/.f2c/config'
     
     def __init__(self):
         usage = '''
@@ -466,6 +466,11 @@ class F2CS :
     setClusterVmGroupSize
     getClusterVmGroup
 示例:   
+    #配置API信息
+        ./f2cs.py config --endpoint=<API EndPoint> --id=<Consumer Key> --secret=<Consumer Secret>
+        如:
+        ./f2cs.py config --endpoint=https://aliyun.fit2cloud.com:8443/rest/ --id=dAZ22gbo --secret=b60a-4728-8dff
+
     #列出用户下的所有集群
         ./f2cs.py listClusters    
     
