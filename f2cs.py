@@ -316,6 +316,12 @@ class F2CRestWSClient(object):
         url='%sclustervmgroup/setsize/%s/%s/%s' % (self.endPoint, cluster_name, vmgroup_name, size)
         jsonResponse = self.get(url, self.accessKeyId, self.secretKey)
         return jsonResponse
+    
+    def upgradeUpdateClient(self, cluster_id, clusterrole_id, vm_id):
+        url='%seventagent/upgrade?clusterId=%s&clusterRoleId=%s&serverId=%s' % (self.endPoint, cluster_id, clusterrole_id, vm_id)
+        print url
+        jsonResponse = self.get(url, self.accessKeyId, self.secretKey)
+        return jsonResponse
         
     def get(self,url,key,secret, parameters={}):
         consumer = oauth.Consumer(key=key, secret=secret)
@@ -811,6 +817,29 @@ class F2CS :
         args = parser.parse_args(sys.argv[2:])
         print 'Running executeScript, cluster_id=%s' % args.cluster_id
         pass
+    
+    def upgradeUpdateClient(self, argv):
+        f2cWsClient = self.getF2CWSClient()
+        if f2cWsClient==None :
+            self.printAPIConfigRequiredMsg()
+            sys.exit()
+            pass
+        parser = argparse.ArgumentParser(description='升级UpdateClient')
+        arg = parser.add_argument
+        arg('--cluster-id', nargs='?', const=True, default="", metavar='cluster id', help='-c, --cluster-id is required', required=False)
+        arg('--clusterrole-id', nargs='?', const=True, default="", metavar='cluster role id', help='-r, --clusterrole-id is not required', required=False)
+        arg('--vm-id', nargs='?', const=True, default="", metavar='host id', help='-h, --host-id is not required', required=False)
+        args = parser.parse_args(sys.argv[2:])
+        strResponse = None
+        try:
+            strResponse = f2cWsClient.upgradeUpdateClient(args.cluster_id, args.clusterrole_id, args.vm_id)
+            if(strResponse!=None and strResponse!="") :
+                print strResponse
+        except Exception, e:
+            print e
+            sys.exit(0)
+        pass
 
 if __name__ == "__main__":
     F2CS()
+
